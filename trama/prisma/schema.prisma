@@ -1,0 +1,206 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String   @id @default(cuid())
+  name                  String?
+  email                 String   @unique
+  passwordHash          String?
+  image                 String?
+  plan                  Plan     @default(FREE)
+  isAdmin               Boolean  @default(false)
+  isActive              Boolean  @default(true)
+  lastLoginAt           DateTime?
+  hasCompletedOnboarding Boolean @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  ownedProjects  Project[]
+  memberships    ProjectMember[]
+  codings        Coding[]
+  comments       Comment[]
+  adminInvites   AdminInvite[]   @relation("InvitedBy")
+  activityLogs   ActivityLog[]
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  color       String   @default("#6366f1")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId String
+
+  members   ProjectMember[]
+  documents Document[]
+  codes     Code[]
+  themes    Theme[]
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  role      Role     @default(EDITOR)
+  createdAt DateTime @default(now())
+
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+
+  @@unique([userId, projectId])
+}
+
+model Document {
+  id        String       @id @default(cuid())
+  title     String
+  content   String       @db.Text
+  type      DocumentType @default(TXT)
+  mimeType  String?
+  fileUrl   String?
+  fileName  String?
+  wordCount Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+
+  codings Coding[]
+}
+
+model Code {
+  id          String   @id @default(cuid())
+  name        String
+  color       String   @default("#6366f1")
+  description String?
+  createdAt   DateTime @default(now())
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  parent    Code?   @relation("CodeHierarchy", fields: [parentId], references: [id])
+  parentId  String?
+  children  Code[]  @relation("CodeHierarchy")
+
+  codings    Coding[]
+  themeCodes ThemeCode[]
+}
+
+model Coding {
+  id           String   @id @default(cuid())
+  startOffset  Int
+  endOffset    Int
+  selectedText String   @db.Text
+  memo         String?
+  createdAt    DateTime @default(now())
+
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId String
+  code       Code     @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  codeId     String
+  author     User     @relation(fields: [authorId], references: [id])
+  authorId   String
+
+  comments Comment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  coding   Coding @relation(fields: [codingId], references: [id], onDelete: Cascade)
+  codingId String
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+}
+
+model Theme {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  color       String   @default("#8b5cf6")
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+
+  themeCodes ThemeCode[]
+}
+
+model ThemeCode {
+  id String @id @default(cuid())
+
+  theme   Theme  @relation(fields: [themeId], references: [id], onDelete: Cascade)
+  themeId String
+  code    Code   @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  codeId  String
+
+  @@unique([themeId, codeId])
+}
+
+model AdminInvite {
+  id         String       @id @default(cuid())
+  email      String
+  plan       Plan         @default(FREE)
+  message    String?
+  token      String       @unique @default(cuid())
+  status     InviteStatus @default(PENDING)
+  expiresAt  DateTime
+  acceptedAt DateTime?
+  createdAt  DateTime     @default(now())
+
+  invitedBy   User   @relation("InvitedBy", fields: [invitedById], references: [id])
+  invitedById String
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  action     String
+  resource   String
+  resourceId String?
+  metadata   String?  @db.Text
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+}
+
+enum Plan {
+  FREE
+  PRO
+  TEAM
+}
+
+enum Role {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum DocumentType {
+  TXT
+  PDF
+  DOCX
+  MARKDOWN
+  AUDIO
+  VIDEO
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}

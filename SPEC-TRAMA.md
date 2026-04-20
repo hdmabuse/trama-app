@@ -508,13 +508,13 @@ O sistema oferece ferramentas para análise manual eficiente:
 
 ### 4.1.3 Por Que Sem IA?
 
-| Aspecto | Antes (com IA) | Agora (sem IA) |
-|---------|---------------|----------------|
-| Custo API | $50-200/mês | $0 |
-| Complexidade | Alta | Baixa |
-| Dados | Enviados para外部 | 100% locais |
-| Controle | Limitado | Total |
-| Infraestrutura | cara | VPS $5-10/mês |
+| Aspecto        | Antes (com IA)    | Agora (sem IA)     |
+| -------------- | ----------------- | ------------------ |
+| Custo API      | $50-200/mês       | $0                 |
+| Complexidade   | Alta              | Baixa              |
+| Dados          | Enviados para外部   | 100% locais        |
+| Controle       | Limitado          | Total              |
+| Infraestrutura | cara              | VPS $5-10/mês      |
 | Confiabilidade | Depende do modelo | Depende do usuário |
 
 ---
@@ -1358,15 +1358,15 @@ Wide:      > 1440px  (3 colunas + área extra)
 
 ## 8.1 Planos
 
-| Recurso | Free | Pro | Team |
-|---------|------|-----|------|
-| Preço | R$ 0 | R$ 39/mês | R$ 99/mês |
-| Projetos | 3 | 20 | Ilimitado |
-| Documentos/projeto | 20 | 100 | 500 |
-| Membros | 1 | 5 | 20 |
-| IA daily | 10 | 100 | 500 |
-| Suporte | comunidade | email | priority |
-| Exportação | básico | completo | completo |
+| Recurso            | Free       | Pro       | Team      |
+| ------------------ | ---------- | --------- | --------- |
+| Preço              | R$ 0       | R$ 39/mês | R$ 99/mês |
+| Projetos           | 3          | 20        | Ilimitado |
+| Documentos/projeto | 20         | 100       | 500       |
+| Membros            | 1          | 5         | 20        |
+| IA daily           | 10         | 100       | 500       |
+| Suporte            | comunidade | email     | priority  |
+| Exportação         | básico     | completo  | completo  |
 
 ## 8.2 Monetização
 
