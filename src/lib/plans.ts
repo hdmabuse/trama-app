@@ -45,5 +45,5 @@ export async function checkPlanLimit(
 }
 
 export function canExport(plan: PlanType, format: string): boolean {
-  return PLAN_LIMITS[plan].exports.includes(format);
+  return (PLAN_LIMITS[plan].exports as unknown as string[]).includes(format);
 }

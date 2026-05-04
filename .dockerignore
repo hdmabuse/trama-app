@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.gitignore
+.env
+.env.local
+*.md
+!GUIA-INSTALACAO.md
+uploads
+.DS_Store
+*.log
+.vscode
+.idea
+coverage

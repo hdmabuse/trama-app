@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { readFile, stat } from "fs/promises";
-import { join } from "path";
+import { join, resolve } from "path";
 
 const UPLOAD_DIR = join(process.cwd(), "uploads");
 
@@ -19,14 +21,25 @@ const CONTENT_TYPES: Record<string, string> = {
 };
 
 export async function GET(_: Request, { params }: { params: { filename: string } }) {
+  // Autenticação obrigatória
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
+  }
+
   const filename = params.filename;
 
-  // Prevent directory traversal
-  if (filename.includes("..") || filename.includes("/")) {
+  // Proteção contra path traversal (dupla verificação)
+  if (filename.includes("..") || filename.includes("/") || filename.includes("\\") || filename.includes("\0")) {
     return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
   }
 
-  const filepath = join(UPLOAD_DIR, filename);
+  const filepath = resolve(UPLOAD_DIR, filename);
+
+  // Garantir que o caminho resolvido está dentro do UPLOAD_DIR
+  if (!filepath.startsWith(resolve(UPLOAD_DIR))) {
+    return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+  }
 
   try {
     await stat(filepath);

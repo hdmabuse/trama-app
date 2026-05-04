@@ -74,6 +74,11 @@ model Document {
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId String
 
+  // Memorando: relação com documento-fonte
+  linkedDocumentId String?
+  linkedDocument   Document?  @relation("MemoLink", fields: [linkedDocumentId], references: [id], onDelete: SetNull)
+  linkedMemos      Document[] @relation("MemoLink")
+
   codings Coding[]
 }
 
@@ -196,6 +201,7 @@ enum DocumentType {
   MARKDOWN
   AUDIO
   VIDEO
+  MEMO
 }
 
 enum InviteStatus {

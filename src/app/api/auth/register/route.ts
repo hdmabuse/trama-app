@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { prisma } from "@/lib/db";
+import { registerSchema, parseBody } from "@/lib/validations";
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { name, email, password } = body;
+  const parsed = parseBody(registerSchema, body);
+  if ("error" in parsed) return NextResponse.json({ error: parsed.error }, { status: 400 });
 
-  if (!name || !email || !password) return NextResponse.json({ error: "Nome, email e senha obrigatórios" }, { status: 400 });
-  if (password.length < 8) return NextResponse.json({ error: "Senha deve ter no mínimo 8 caracteres" }, { status: 400 });
-  if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
-    return NextResponse.json({ error: "Senha deve ter maiúscula, minúscula e número" }, { status: 400 });
-  }
+  const { name, email, password } = parsed.data;
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) return NextResponse.json({ error: "Já existe uma conta com este email" }, { status: 409 });
