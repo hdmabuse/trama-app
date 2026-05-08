@@ -30,7 +30,13 @@ export default function ConvitePage() {
     if (!res.ok) { const d = await res.json(); setError(d.error); setSaving(false); return; }
     const data = await res.json();
     await signIn("credentials", { email: data.email, password, redirect: false });
-    router.push("/dashboard");
+    
+    // Redirect to billing upgrade if invited plan is PRO or TEAM
+    if (invite?.plan === "PRO" || invite?.plan === "TEAM") {
+      router.push("/billing/upgrade");
+    } else {
+      router.push("/dashboard");
+    }
   }
 
   if (loading) return <div className="min-h-screen bg-stone-50 flex items-center justify-center"><p className="text-stone-400">Verificando convite...</p></div>;
@@ -58,6 +64,11 @@ export default function ConvitePage() {
           <p className="text-lg font-semibold text-trama-600">{planLabels[invite.plan]}</p>
         </div>
         {invite.message && <p className="text-sm text-stone-500 bg-stone-50 rounded-lg p-3 mb-6 italic">&ldquo;{invite.message}&rdquo;</p>}
+        {invite.plan === "FREE" && (
+          <div className="text-xs text-stone-500 bg-blue-50 rounded-lg p-3 mb-4">
+            Você começará no plano <strong>Free</strong>. Após criar sua conta, você poderá fazer upgrade para <strong>Pro (R$ 39/mês)</strong> ou <strong>Team (R$ 99/mês)</strong> quando precisar de mais recursos.
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label className="block text-xs font-medium text-stone-500 mb-1">Email</label>

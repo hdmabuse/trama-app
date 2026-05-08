@@ -17,6 +17,7 @@ model User {
   isAdmin               Boolean  @default(false)
   isActive              Boolean  @default(true)
   lastLoginAt           DateTime?
+  locale                String   @default("pt")
   hasCompletedOnboarding Boolean @default(false)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
@@ -27,6 +28,7 @@ model User {
   comments       Comment[]
   adminInvites   AdminInvite[]   @relation("InvitedBy")
   activityLogs   ActivityLog[]
+  subscriptions  Subscription[]
 }
 
 model Project {
@@ -209,4 +211,52 @@ enum InviteStatus {
   ACCEPTED
   EXPIRED
   CANCELLED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+  PENDING
+}
+
+model Subscription {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan              Plan
+  status            SubscriptionStatus @default(ACTIVE)
+  mercadoPagoId     String   @unique
+  mercadoPagoPlanId String
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd Boolean  @default(false)
+  lastPaymentId     String?  @db.Text
+  lastPaymentStatus String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  payments Payment[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Payment {
+  id              String   @id @default(cuid())
+  subscriptionId  String
+  subscription    Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  mercadoPagoPaymentId String @unique
+  amount          Int
+  currency        String   @default("BRL")
+  status          String
+  paymentMethod   String?
+  installments    Int?
+  cardLast4       String?
+  receiptUrl      String?
+  transactionDate DateTime
+  createdAt       DateTime @default(now())
+
+  @@index([subscriptionId])
 }

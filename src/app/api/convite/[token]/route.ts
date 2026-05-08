@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { logActivity } from "@/lib/activity";
+import { registerSchema } from "@/lib/validations";
 
 export async function GET(_: Request, { params }: { params: { token: string } }) {
   const invite = await prisma.adminInvite.findUnique({ where: { token: params.token } });
@@ -21,8 +22,14 @@ export async function POST(req: Request, { params }: { params: { token: string }
 
   const body = await req.json();
   const { name, password } = body;
-  if (!name || !password || password.length < 8) {
-    return NextResponse.json({ error: "Nome e senha (mín. 8 caracteres) obrigatórios" }, { status: 400 });
+
+  // Usa o mesmo schema de validação do registro para garantir senha forte
+  const passwordCheck = registerSchema.shape.password.safeParse(password);
+  if (!name || !passwordCheck.success) {
+    const msg = !name
+      ? "Nome obrigatório"
+      : passwordCheck.error!.issues.map((i) => i.message).join("; ");
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
 
   const passwordHash = await hash(password, 12);

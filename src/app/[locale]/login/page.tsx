@@ -2,6 +2,7 @@
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { LocaleSwitcher } from '@/components/ui/LocaleSwitcher'
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,8 +38,11 @@ export default function LoginPage() {
               className="w-full px-3 py-2.5 rounded-lg border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-trama-500/30 focus:border-trama-500 transition" placeholder="••••••••" />
           </div>
           {error && <p className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
-          <button type="submit" disabled={loading}
-            className="w-full py-2.5 bg-trama-500 hover:bg-trama-600 text-white font-medium text-sm rounded-lg transition disabled:opacity-50">
+          <div className="absolute top-4 right-4">
+  <LocaleSwitcher variant="light" />
+</div>
+<button type="submit" disabled={loading}
+  className="w-full py-2.5 bg-trama-500 hover:bg-trama-600 text-white font-medium text-sm rounded-lg transition disabled:opacity-50">
             {loading ? "Entrando..." : "Entrar"}
           </button>
         </form>

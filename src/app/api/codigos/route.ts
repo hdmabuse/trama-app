@@ -62,12 +62,11 @@ export async function DELETE(req: Request) {
   // Verificar que o código pertence a um projeto do usuário
   const code = await prisma.code.findUnique({
     where: { id },
-    select: { project: { select: { ownerId: true } } },
+    select: { projectId: true, project: { select: { ownerId: true } } },
   });
 
   if (!code) return NextResponse.json({ error: "Código não encontrado" }, { status: 404 });
 
-  const hasAccess = await userCanAccessProject(session.user.id, id);
   const isOwner = code.project.ownerId === session.user.id;
   if (!isOwner) {
     return NextResponse.json({ error: "Apenas o dono do projeto pode deletar códigos" }, { status: 403 });

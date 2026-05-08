@@ -4,7 +4,6 @@ import { authOptions } from "@/lib/auth";
 import { Suspense } from "react";
 import { HeroSectionWrapper } from "@/components/landing/HeroSectionWrapper";
 import { HowItWorks } from "@/components/landing/HowItWorks";
-import { PoliticalSection } from "@/components/landing/PoliticalSection";
 import { FinalCTA } from "@/components/landing/FinalCTA";
 import type { Metadata } from "next";
 
@@ -24,7 +23,6 @@ export default async function Home() {
         <HeroSectionWrapper />
       </Suspense>
       <HowItWorks />
-      <PoliticalSection />
       <FinalCTA />
     </main>
   );

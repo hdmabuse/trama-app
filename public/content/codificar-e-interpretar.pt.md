@@ -3,7 +3,7 @@
 ## Análise Temática, Saberes Situados e Consciência Crítica como Fundamentos Epistemológicos da Pesquisa Qualitativa Situada no Brasil
 
 **José Carlos Porto Arcoverde Jr.**
-CESAR School / Instituto Fab Lab Rec — Recife, PE
+scienceestudios.com.br / Instituto Fab Lab Rec — Recife, PE
 
 ---
 
@@ -135,4 +135,4 @@ VIEIRA PINTO, Álvaro. **O Conceito de Tecnologia**. 2 v. Rio de Janeiro: Contra
 
 ---
 
-*Instituto Fab Lab Rec / CESAR School — Recife, PE — Abril 2026*
+*scienceestudios.com.br - Recife, PE - Abril 2026*

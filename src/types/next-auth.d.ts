@@ -16,6 +16,12 @@ declare module "next-auth" {
       image?: string | null;
       plan: "FREE" | "PRO" | "TEAM";
       isAdmin: boolean;
+      subscription?: {
+        plan: "FREE" | "PRO" | "TEAM";
+        status: string;
+        currentPeriodEnd: Date;
+        cancelAtPeriodEnd: boolean;
+      } | null;
     };
   }
 }
@@ -25,5 +31,11 @@ declare module "next-auth/jwt" {
     id: string;
     plan: "FREE" | "PRO" | "TEAM";
     isAdmin: boolean;
+    subscription?: {
+      plan: "FREE" | "PRO" | "TEAM";
+      status: string;
+      currentPeriodEnd: Date;
+      cancelAtPeriodEnd: boolean;
+    } | null;
   }
 }

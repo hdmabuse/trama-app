@@ -48,6 +48,22 @@ export const authOptions: NextAuthOptions = {
         token.plan = user.plan;
         token.isAdmin = user.isAdmin;
       }
+
+      const subscription = await prisma.subscription.findFirst({
+        where: {
+          userId: token.id,
+          status: { in: ["ACTIVE", "PAST_DUE"] },
+        },
+        select: {
+          plan: true,
+          status: true,
+          currentPeriodEnd: true,
+          cancelAtPeriodEnd: true,
+        },
+      });
+
+      token.subscription = subscription;
+
       return token;
     },
     async session({ session, token }) {
@@ -55,6 +71,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id;
         session.user.plan = token.plan;
         session.user.isAdmin = token.isAdmin;
+        session.user.subscription = token.subscription;
       }
       return session;
     },

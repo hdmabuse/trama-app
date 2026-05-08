@@ -3,6 +3,7 @@ import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 import { PlanBadge } from "./PlanBadge";
+import { LocaleSwitcher } from '@/components/ui/LocaleSwitcher'
 
 export function Header() {
   const { data: session } = useSession();
@@ -15,6 +16,7 @@ export function Header() {
       <Link href="/dashboard" className="shrink-0">
         <span className="text-xl font-black text-trama-500 tracking-tight">trama</span>
       </Link>
+
       <div className="flex-1 max-w-md mx-auto">
         <div className="flex items-center bg-stone-50 border border-stone-200 rounded-lg px-3 py-1.5 gap-2">
           <svg className="w-3.5 h-3.5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -23,13 +25,23 @@ export function Header() {
           <span className="text-xs text-stone-400">Buscar... (⌘K)</span>
         </div>
       </div>
+
       <div className="flex items-center gap-3">
         {user?.isAdmin && (
-          <Link href="/admin" className="text-xs text-stone-400 hover:text-trama-500 font-medium px-2 py-1 rounded-md hover:bg-stone-50 transition">Admin</Link>
+          <Link href="/admin" className="text-xs text-stone-400 hover:text-trama-500 font-medium px-2 py-1 rounded-md hover:bg-stone-50 transition">
+            Admin
+          </Link>
         )}
         {user?.plan && <PlanBadge plan={user.plan} />}
+
+        {/* Seletor de idioma */}
+        <LocaleSwitcher variant="light" saveToDb={true} />
+
         <div className="relative">
-          <button onClick={() => setShowMenu(!showMenu)} className="w-8 h-8 rounded-full bg-argila text-white text-xs font-semibold flex items-center justify-center">
+          <button
+            onClick={() => setShowMenu(!showMenu)}
+            className="w-8 h-8 rounded-full bg-argila text-white text-xs font-semibold flex items-center justify-center"
+          >
             {initials}
           </button>
           {showMenu && (
@@ -38,8 +50,17 @@ export function Header() {
                 <p className="text-sm font-medium text-stone-800">{user?.name}</p>
                 <p className="text-xs text-stone-400">{user?.email}</p>
               </div>
-              <Link href="/constituicao" className="block px-3 py-2 text-sm text-stone-600 hover:bg-stone-50" onClick={() => setShowMenu(false)}>Constituição ética</Link>
-              <button onClick={() => signOut({ callbackUrl: "/login" })} className="w-full text-left px-3 py-2 text-sm text-stone-600 hover:bg-stone-50">
+              <Link
+                href="/constituicao"
+                className="block px-3 py-2 text-sm text-stone-600 hover:bg-stone-50"
+                onClick={() => setShowMenu(false)}
+              >
+                Constituição ética
+              </Link>
+              <button
+                onClick={() => signOut({ callbackUrl: "/login" })}
+                className="w-full text-left px-3 py-2 text-sm text-stone-600 hover:bg-stone-50"
+              >
                 Sair
               </button>
             </div>

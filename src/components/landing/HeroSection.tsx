@@ -2,64 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { LocaleSwitcher } from '@/components/ui/LocaleSwitcher'
+import { useTranslations } from 'next-intl'
+import { useHeroVariant } from '@/lib/useHeroVariant'
 
-// ─── Tipos ───────────────────────────────────────────────────────────────────
-
-interface HeroVariant {
-  headline: string[]
-  sub1: string
-  sub2: string
-  cta1: string
-  cta2: string
-}
-
-// ─── Copy v3 ─────────────────────────────────────────────────────────────────
-// Fundamentação: etnografia contemporânea (Ingold 2011, Latour 2005,
-// Clifford & Marcus 1986) + Braun & Clarke (2006/2019) + Haraway (1988)
-//
-// Mudanças v2 → v3:
-// A: headline incorpora co-produção do dado no encontro (Ingold/Latour)
-//    sub1: adiciona "versão possível" e "conceito que ainda não tem nome"
-//    sub2: "campo não precede a análise" como formulação central
-// Sem travessões em todo o copy (substituídos por vírgulas ou ponto final)
-
-const VARIANTS: Record<'A' | 'B', HeroVariant> = {
-  A: {
-    headline: [
-      'O dado não existia antes do encontro.',
-      'Você o produziu.',
-    ],
-    sub1:
-      'Quando você escreve "barreira de acesso" ao lado de um trecho, não está apenas interpretando o que o interlocutor disse. Está construindo uma versão possível de um encontro que poderia ter gerado "pragmatismo adaptativo", "resistência velada", ou um conceito que ainda não tem nome.',
-    sub2:
-      'TRAMA foi feito para pesquisadores que sabem que o campo não precede a análise. E querem uma ferramenta que não finja o contrário.',
-    cta1: 'Começar gratuitamente',
-    cta2: 'Ver demonstração',
-  },
-  B: {
-    headline: [
-      'Análise qualitativa em que',
-      'você constrói o sentido.',
-    ],
-    sub1:
-      'Suas entrevistas, suas interpretações. TRAMA não usa IA para categorizar por você, porque isso já seria uma escolha epistemológica que não é sua.',
-    sub2: 'Sem IA. Seus dados ficam com você. Em português.',
-    cta1: 'Começar a analisar',
-    cta2: 'Ver como funciona',
-  },
-}
-
-// Ordem epistêmica: "Sem IA" primeiro porque é o argumento central,
-// não apenas uma feature de privacidade
 const DIFFERENTIALS = [
-  { label: 'Sem IA',        desc: 'Você interpreta. A ferramenta organiza.' },
-  { label: 'Seus dados',    desc: 'AGPL. Self-hostável. Zero telemetria.' },
-  { label: 'PT-BR',         desc: 'Interface e suporte em português.' },
-  { label: 'Código aberto', desc: 'github.com/hdmabuse/trama-app' },
-  { label: 'Gratuito',      desc: 'Sem plano pago nem cartão.' },
+  { labelKey: 'differential_no_ai',       descKey: 'differential_no_ai_desc' },
+  { labelKey: 'differential_your_data',   descKey: 'differential_your_data_desc' },
+  { labelKey: 'differential_language',   descKey: 'differential_language_desc' },
+  { labelKey: 'differential_open',       descKey: 'differential_open_desc' },
+  { labelKey: 'differential_free',       descKey: 'differential_free_desc' },
 ]
-
-// ─── SVG animado da teia ─────────────────────────────────────────────────────
 
 function TeiaSVG() {
   return (
@@ -99,7 +52,6 @@ function TeiaSVG() {
         }
       `}</style>
 
-      {/* Documento que representa o encontro */}
       <g className="teia-node" style={{ animationDelay: '0ms' }}>
         <rect x="8" y="60" width="64" height="80" rx="4"
           fill="var(--color-bg-2, #f8f9fa)"
@@ -113,7 +65,6 @@ function TeiaSVG() {
           fill="var(--color-text-3, #9ca3af)">encontro</text>
       </g>
 
-      {/* Seta */}
       <line x1="72" y1="100" x2="108" y2="100"
         stroke="var(--color-border, #e5e7eb)" strokeWidth="1.5"
         markerEnd="url(#arrowv3)"
@@ -126,7 +77,6 @@ function TeiaSVG() {
         </marker>
       </defs>
 
-      {/* Teia */}
       <g className="teia-float">
         <line x1="170" y1="100" x2="210" y2="58"  stroke="#0D948840" strokeWidth="1.5" className="teia-line" style={{ animationDelay: '700ms' }} />
         <line x1="170" y1="100" x2="240" y2="100" stroke="#0D948440" strokeWidth="2"   className="teia-line" style={{ animationDelay: '800ms' }} />
@@ -156,18 +106,18 @@ function TeiaSVG() {
   )
 }
 
-// ─── Componente principal ─────────────────────────────────────────────────────
-
-interface HeroSectionProps {
-  variant?: 'A' | 'B'
-}
-
-export function HeroSection({ variant = 'A' }: HeroSectionProps) {
-  const copy = VARIANTS[variant]
+export function HeroSection({ variant = 'A' }: { variant?: 'A' | 'B' }) {
+  const t = useTranslations('hero')
   const [mounted, setMounted] = useState(false)
   const heroRef = useRef<HTMLElement>(null)
 
   useEffect(() => { setMounted(true) }, [])
+
+  const headline = t(`headline_${variant === 'A' ? 'a' : 'b'}_1`)
+  const sub1 = t(`sub1_${variant === 'A' ? 'a' : 'b'}`)
+  const sub2 = t(`sub2_${variant === 'A' ? 'a' : 'b'}`)
+  const cta1 = t(`cta_primary_${variant === 'A' ? 'a' : 'b'}`)
+  const microcopy = t('microcopy')
 
   return (
     <section
@@ -192,58 +142,48 @@ export function HeroSection({ variant = 'A' }: HeroSectionProps) {
 
       <div className="relative max-w-6xl mx-auto">
 
-        {/* Nav */}
         <nav className="flex items-center justify-between mb-16" aria-label="Navegação principal">
           <span className="text-[15px] font-medium text-teal-600 dark:text-teal-400 tracking-tight">
             TRAMA
           </span>
           <div className="hidden md:flex items-center gap-8 text-sm text-neutral-500 dark:text-neutral-400">
-            <Link href="/documentacao" className="hover:text-neutral-900 dark:hover:text-white transition-colors">Documentação</Link>
             <a href="https://github.com/hdmabuse/trama-app" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-900 dark:hover:text-white transition-colors">GitHub</a>
-            <Link href="/epistemologia" className="hover:text-neutral-900 dark:hover:text-white transition-colors">Epistemologia</Link>
+            <Link href="/epistemologia" className="hover:text-neutral-900 dark:hover:text-white transition-colors">Construção do conhecimento</Link>
           </div>
-          <Link href="/cadastro" className="px-4 py-2 text-sm font-medium bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
-            Começar
-          </Link>
+          <div className="flex items-center gap-3">
+            <LocaleSwitcher variant="light" />
+            <Link href="/cadastro" className="px-4 py-2 text-sm font-medium bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+              Começar
+            </Link>
+          </div>
         </nav>
 
-        {/* Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-          {/* Copy */}
           <div>
-            <p
-              className="text-xs font-semibold uppercase tracking-[0.1em] text-teal-600 dark:text-teal-400 mb-5"
-              style={{ animation: mounted ? 'fadeSlideUp 0.6s 0ms ease-out both' : 'none' }}
-            >
-              Análise Qualitativa Reflexiva
-            </p>
-
             <h1
               id="hero-headline"
               className="text-4xl md:text-5xl font-medium leading-[1.15] text-neutral-900 dark:text-white mb-6"
               style={{ animation: mounted ? 'fadeSlideUp 0.6s 80ms ease-out both' : 'none' }}
             >
-              {copy.headline.map((line, i) => (
-                <span key={i} className={i < copy.headline.length - 1 ? 'block' : ''}>
-                  {line}
-                </span>
-              ))}
+              {headline}
             </h1>
 
             <p
               className="text-base text-neutral-600 dark:text-neutral-300 leading-relaxed mb-4"
               style={{ animation: mounted ? 'fadeSlideUp 0.6s 160ms ease-out both' : 'none' }}
             >
-              {copy.sub1}
+              {sub1}
             </p>
 
-            <p
-              className="text-base text-neutral-600 dark:text-neutral-300 leading-relaxed mb-8"
-              style={{ animation: mounted ? 'fadeSlideUp 0.6s 200ms ease-out both' : 'none' }}
-            >
-              {copy.sub2}
-            </p>
+            {sub2 && (
+              <p
+                className="text-base text-neutral-600 dark:text-neutral-300 leading-relaxed mb-8"
+                style={{ animation: mounted ? 'fadeSlideUp 0.6s 200ms ease-out both' : 'none' }}
+              >
+                {sub2}
+              </p>
+            )}
 
             <div
               className="flex flex-wrap items-center gap-3 mb-5"
@@ -255,15 +195,7 @@ export function HeroSection({ variant = 'A' }: HeroSectionProps) {
                 data-analytics-id="hero-cta-primary"
                 data-variant={variant}
               >
-                {copy.cta1}
-              </Link>
-              <Link
-                href="/demo"
-                className="px-6 py-3 text-sm font-medium border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
-                data-analytics-id="hero-cta-secondary"
-                data-variant={variant}
-              >
-                {copy.cta2}
+                {cta1}
               </Link>
             </div>
 
@@ -271,11 +203,10 @@ export function HeroSection({ variant = 'A' }: HeroSectionProps) {
               className="text-xs text-neutral-400 dark:text-neutral-500"
               style={{ animation: mounted ? 'fadeSlideUp 0.6s 300ms ease-out both' : 'none' }}
             >
-              Sem cartão de crédito · sem IA · seus dados ficam com você · AGPL-3.0
+              {microcopy}
             </p>
           </div>
 
-          {/* SVG teia */}
           <div
             className="relative h-56 md:h-72 lg:h-80"
             style={{ animation: mounted ? 'fadeSlideUp 0.6s 120ms ease-out both' : 'none' }}
@@ -285,19 +216,18 @@ export function HeroSection({ variant = 'A' }: HeroSectionProps) {
           </div>
         </div>
 
-        {/* Diferenciais */}
         <div
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mt-14 pt-10 border-t border-neutral-100 dark:border-neutral-800"
           style={{ animation: mounted ? 'fadeSlideUp 0.6s 360ms ease-out both' : 'none' }}
         >
           {DIFFERENTIALS.map((d, i) => (
             <div
-              key={d.label}
+              key={d.labelKey}
               className="text-center px-3 py-3 bg-neutral-50 dark:bg-neutral-900 rounded-lg border border-neutral-100 dark:border-neutral-800 hover:border-teal-200 dark:hover:border-teal-800 transition-colors duration-150"
               style={{ animation: mounted ? `fadeSlideUp 0.5s ${360 + i * 50}ms ease-out both` : 'none' }}
             >
-              <p className="text-xs font-medium text-neutral-700 dark:text-neutral-200 mb-1">{d.label}</p>
-              <p className="text-[10px] text-neutral-400 dark:text-neutral-500 leading-snug hidden sm:block">{d.desc}</p>
+              <p className="text-xs font-medium text-neutral-700 dark:text-neutral-200 mb-1">{t(d.labelKey)}</p>
+              <p className="text-[10px] text-neutral-400 dark:text-neutral-500 leading-snug hidden sm:block">{t(d.descKey)}</p>
             </div>
           ))}
         </div>
